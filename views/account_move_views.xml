@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_move_form_inherit_coretax" model="ir.ui.view">
+        <field name="name">account.move.form.inherit.coretax</field>
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="account.view_move_form"/>
+        <field name="arch" type="xml">
+            <!-- Tombol Action di Header Invoice (Terkunci jika status sudah posted di DJP) -->
+            <xpath expr="//header" position="inside">
+                <button name="action_generate_coretax_xml" 
+                        string="Generate Coretax XML" 
+                        type="object" 
+                        class="btn-primary" 
+                        invisible="move_type not in ('out_invoice', 'out_refund') or state != 'posted' or coretax_status == 'posted'"/>
+            </xpath>
+
+            <!-- Menambahkan Tab Khusus e-Faktur Coretax di Form Invoice -->
+            <xpath expr="//notebook" position="inside">
+                <page string="e-Faktur Coretax DJP" invisible="move_type not in ('out_invoice', 'out_refund')">
+                    <group>
+                        <group string="Identitas Pajak DJP">
+                            <field name="efaktur_nsfp" placeholder="Contoh: 0100002600000001" readonly="coretax_status == 'posted'"/>
+                            <field name="coretax_trx_code" readonly="coretax_status == 'posted'"/>
+                            <field name="is_retail_consumer" readonly="coretax_status == 'posted'"/>
+                            <field name="partner_npwp16" placeholder="16 Digit NIK/NPWP" invisible="is_retail_consumer" readonly="coretax_status == 'posted'"/>
+                            <field name="kmk_tax_rate" readonly="coretax_status == 'posted'"/>
+                        </group>
+                        <group string="Status &amp; Export Dokumen">
+                            <field name="coretax_status" widget="badge" 
+                                   decoration-info="coretax_status == 'draft'" 
+                                   decoration-warning="coretax_status in ('ready', 'generated')" 
+                                   decoration-success="coretax_status == 'posted'"
+                                   decoration-danger="coretax_status == 'rejected'"/>
+                            <field name="coretax_xml_filename" invisible="1"/>
+                            <field name="coretax_xml_file" filename="coretax_xml_filename"/>
+                        </group>
+                    </group>
+                </page>
+            </xpath>
+        </field>
+    </record>
+</odoo>
